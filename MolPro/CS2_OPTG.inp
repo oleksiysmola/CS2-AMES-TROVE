@@ -1,0 +1,23 @@
+***, CS2 Ground State Energy with CCSD(T) and aug-cc-pV(Q+d)Z
+memory,500,m;
+
+geometry={angstrom
+C 
+S , 1, r1 
+S , 1, r2, 2, alpha
+}
+
+r1 = 1.01
+r2 = 1.00
+alpha = 170.0
+
+basis=aug-cc-pV(Q+d)Z
+
+hf
+optg,procedure=runccsd2,savexyz=PH2_eq.xyz
+runccsd2={hf;ccsd(t)}
+
+{ccsd(t)}
+
+
+--- End of Script ---

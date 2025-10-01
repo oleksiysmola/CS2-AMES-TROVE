@@ -1,0 +1,20 @@
+***, CS2 Ground State Energy with CCSD(T) and aug-cc-pVQZ-f12
+memory,500,m;
+
+geometry={angstrom
+C 
+S , 1, r1 
+S , 1, r2, 2, alpha
+}
+
+r1 = 1.55275
+r2 = 1.55275
+alpha = 280.00
+
+basis=aug-cc-pVQZ-f12
+
+hf
+{ccsd(t)-f12}
+
+
+--- End of Script ---

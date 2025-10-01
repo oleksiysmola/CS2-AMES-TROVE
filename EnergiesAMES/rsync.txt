@@ -1,0 +1,1 @@
+rsync --inplace --progress dc-smol1@dial.dirac.ac.uk:/scratch/dp060/dc-smol1/CS2/RefitAMESPotential/CS2-Refit2.dat 
