@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from pandarallel import pandarallel
 pandarallel.initialize(progress_bar=True)
 
@@ -64,16 +65,33 @@ def findMatchingLevel(row, states):
     row["TroveID"] = matchingState["i"]
     row["Etrove"] = matchingState["E"]
     row["Obs-Calc"] = matchingState["Obs-Calc"]
+    row["Gamma"] = matchingState["Gamma"]
+    row["K"] = matchingState["K"]
+    row["n1"] = matchingState["n1"]
+    row["n2"] = matchingState["n2"]
+    row["n3"] = matchingState["n3"]
     return row
 
 marvelEnergies = marvelEnergies.parallel_apply(lambda x:findMatchingLevel(x, states), result_type="expand", axis=1)
 print(marvelEnergies.head(20).to_string(index=False))
 marvelEnergiesReduced = marvelEnergies.dropna()
+refinementEnergies = marvelEnergies.copy()
+marvelEnergies = marvelEnergies[["nu1", "nu2", "l2", "nu3", "e/f", "J", "Em", "Uncertainty", "Transitions", "TroveID", "Etrove", "Obs-Calc"]]
 marvelEnergies = marvelEnergies.to_string(index=False, header=False)
 marvelisedFile = "CS2-Matched-KRot5-REFIT2-AMES.out"
 with open(marvelisedFile, "w+") as FileToWriteTo:
     FileToWriteTo.write(marvelEnergies)
 print("New states file ready!")
+
+
+refinementEnergies = refinementEnergies[refinementEnergies["J"] <= 10]
+refinementEnergies = refinementEnergies.sort_values(by="J")
+refinementEnergies["weight"] = np.tanh(1 - refinementEnergies["Uncertainty"].astype(float))*refinementEnergies["Transitions"].astype(int)
+refinementEnergies = refinementEnergies[["J", "Gamma", "TroveID", "Em", "K", "n1", "n2", "n3", "weight"]]
+refinementEnergies = refinementEnergies.to_string(header=False, index=False)
+refinementFile = "CS2-RefinementEnergies.ref"
+with open(refinementFile, "w+") as FileToWriteTo:
+    FileToWriteTo.write(refinementEnergies)
 
 marvelEnergiesReduced = marvelEnergiesReduced.to_string(index=False, header=False)
 marvelisedFileReduced = "CS2-Matched-KRot5-REFIT2-AMES-Reduced.out"
